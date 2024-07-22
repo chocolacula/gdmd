@@ -1,4 +1,6 @@
 .vscode
 .idea
 
+/gdmd
+
 .DS_Store
