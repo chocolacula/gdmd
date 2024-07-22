@@ -1,0 +1,120 @@
+# Overview
+
+{{ if .Doc -}}
+{{ .Doc }}
+{{ end -}}
+## Index
+
+{{ if .Nested -}}
+- [Nested packages](#nested-packages)
+{{ end -}}
+{{ if .Constants -}}
+- [Constants](#constants)
+{{ end -}}
+{{ if .Variables -}}
+- [Variables](#variables)
+{{ end -}}
+{{ if .Functions -}}
+- [Functions](#functions)
+{{ range .Functions }}  - [func {{ .Name }}](#func-{{ .Name | ToLower }})
+{{ end -}}
+{{ end -}}
+{{ if .Types -}}
+- [Types](#types)
+{{ range .Types }}  - [type {{ .Name }}](#type-{{ .Name | ToLower }})
+{{ range .Methods }}    - [func {{ .Name }}](#func-{{ .Name | ToLower }})
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{ if .Files -}}
+- [Source files](#source-files)
+{{- end }}
+
+{{ if .Nested }}## Nested packages
+
+{{ range .Nested }}[{{ .Name }}](./{{ .Dir }}/README.md)</br>
+{{ end }}
+{{ end -}}
+
+{{ if .Constants }}## Constants
+{{ range .Constants }}
+{{- if .Doc }}
+{{ .Doc }}
+{{- end }}
+```go
+{{ .Src }}
+```
+{{ end }}
+{{ end -}}
+
+{{ if .Variables }}## Variables
+{{ range .Variables }}
+{{- if .Doc }}
+{{ .Doc }}
+{{- end }}
+```go
+{{ .Src }}
+```
+{{ end }}
+{{ end -}}
+
+{{ if .Functions }}## Functions
+{{ range .Functions }}
+### func [{{ .Name }}](./{{ .Pos.Filename }}#L{{ .Pos.Line }})
+
+```go
+{{ .Signature }}
+```
+{{ if .Doc }}
+{{ .Doc }}
+{{- end -}}
+{{ end }}
+{{ end -}}
+
+{{ if .Types }}## Types
+{{ range .Types }}
+### type [{{ .Name }}](./{{ .Pos.Filename }}#L{{ .Pos.Line }})
+
+```go
+{{ .Src }}
+```
+{{ if .Doc }}
+{{ .Doc }}
+{{- end -}}
+
+{{ range .Constants }}
+{{- if .Doc }}
+{{ .Doc }}
+{{- end }}
+```go
+{{ .Src }}
+```
+{{ end -}}
+
+{{ range .Variables }}
+{{- if .Doc }}
+{{ .Doc }}
+{{- end }}
+```go
+{{ .Src }}
+```
+{{ end -}}
+
+{{ range .Methods }}
+### func [{{ .Name }}](./{{ .Pos.Filename }}#L{{ .Pos.Line }})
+
+```go
+{{ .Signature }}
+```
+{{ if .Doc }}
+{{ .Doc }}
+{{- end -}}
+{{ end -}}
+{{ end }}
+{{ end -}}
+
+{{ if .Files }}## Source files
+
+{{ end }}
+{{- range .Files }}[{{ . }}](./{{ . }})
+{{ end -}}
