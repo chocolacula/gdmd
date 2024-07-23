@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"go/ast"
 	"go/doc"
 	"go/parser"
@@ -10,6 +11,9 @@ import (
 	"strings"
 )
 
+// Simple error to indicate empty folder
+var EmptyErr = errors.New("empty folder")
+
 func mustParse(fset *token.FileSet, filename string, src []byte) *ast.File {
 	f, err := parser.ParseFile(fset, filename, src, parser.ParseComments)
 	if err != nil {
@@ -18,7 +22,10 @@ func mustParse(fset *token.FileSet, filename string, src []byte) *ast.File {
 	return f
 }
 
-func parse(root, path string) Package {
+// Parse walks the directory tree rooted at root and parses all .go files
+// it returns a [Package] for each directory containing .go files
+// or empty [Package] and [EmptyErr]
+func Parse(root, path string) (Package, error) {
 	ent, _ := os.ReadDir(filepath.Join(root, path))
 
 	fset := token.NewFileSet()
@@ -32,7 +39,10 @@ func parse(root, path string) Package {
 		next := filepath.Join(path, e.Name())
 
 		if e.IsDir() {
-			pkgs = append(pkgs, parse(root, next))
+			pkg, err := Parse(root, next)
+			if err == nil {
+				pkgs = append(pkgs, pkg)
+			} // else ignore error
 		} else {
 			if !strings.HasSuffix(e.Name(), ".go") {
 				continue
@@ -46,8 +56,10 @@ func parse(root, path string) Package {
 
 	p, err := doc.NewFromFiles(fset, files, "example.com")
 	if err != nil {
-		panic(err)
+		return Package{}, err
 	}
-
-	return NewPackage(fset, p, path, pkgs, fnames)
+	if len(fnames) == 0 && len(pkgs) == 0 {
+		return Package{}, EmptyErr
+	}
+	return NewPackage(fset, p, path, pkgs, fnames), nil
 }

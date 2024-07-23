@@ -10,4 +10,4 @@ With `gdmd` you don't even have to host your documentation, you can keep it in y
 
 ## Documentation
 
-Self generated [documentation](doc/README.md)
+Self generated [documentation](cmd/gdmd/README.md)

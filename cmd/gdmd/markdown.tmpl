@@ -1,5 +1,7 @@
 # Overview
 
+package `{{ .Name }}`
+
 {{ if .Doc -}}
 {{ .Doc }}
 {{ end -}}
@@ -28,15 +30,17 @@
 {{ end -}}
 {{ if .Files -}}
 - [Source files](#source-files)
-{{- end }}
-
-{{ if .Nested }}## Nested packages
-
-{{ range .Nested }}[{{ .Name }}](./{{ .Dir }}/README.md)</br>
 {{ end }}
-{{ end -}}
+{{- if .Nested }}
+## Nested packages
 
-{{ if .Constants }}## Constants
+{{ range .Nested -}}
+[{{ .Name }}](./{{ .Dir }}/README.md)
+{{ end -}}
+{{ end }}
+
+{{- if .Constants }}
+## Constants
 {{ range .Constants }}
 {{- if .Doc }}
 {{ .Doc }}
@@ -44,10 +48,11 @@
 ```go
 {{ .Src }}
 ```
-{{ end }}
 {{ end -}}
+{{ end }}
 
-{{ if .Variables }}## Variables
+{{- if .Variables }}
+## Variables
 {{ range .Variables }}
 {{- if .Doc }}
 {{ .Doc }}
@@ -55,10 +60,11 @@
 ```go
 {{ .Src }}
 ```
-{{ end }}
 {{ end -}}
+{{ end }}
 
-{{ if .Functions }}## Functions
+{{- if .Functions }}
+## Functions
 {{ range .Functions }}
 ### func [{{ .Name }}](./{{ .Pos.Filename }}#L{{ .Pos.Line }})
 
@@ -67,11 +73,12 @@
 ```
 {{ if .Doc }}
 {{ .Doc }}
-{{- end -}}
-{{ end }}
-{{ end -}}
+{{- end }}
+{{- end }}
+{{- end }}
 
-{{ if .Types }}## Types
+{{- if .Types }}
+## Types
 {{ range .Types }}
 ### type [{{ .Name }}](./{{ .Pos.Filename }}#L{{ .Pos.Line }})
 
@@ -110,11 +117,14 @@
 {{ .Doc }}
 {{- end -}}
 {{ end -}}
-{{ end }}
 {{ end -}}
-
-{{ if .Files }}## Source files
-
 {{ end }}
-{{- range .Files }}[{{ . }}](./{{ . }})
+
+{{- if .Files }}
+
+## Source files
+
+{{ end -}}
+{{ range .Files -}}
+[{{ . }}](./{{ . }})
 {{ end -}}

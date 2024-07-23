@@ -1,3 +1,4 @@
+// The single package in the project, contains data representation, parsing and generation logic.
 package main
 
 import (
@@ -6,6 +7,8 @@ import (
 	"go/token"
 	"strings"
 )
+
+var printerConf = printer.Config{Mode: printer.UseSpaces, Tabwidth: 2}
 
 // Package represents a Go package with its contents.
 type Package struct {
@@ -63,7 +66,7 @@ type Variable struct {
 
 func NewVariable(fset *token.FileSet, v *doc.Value) Variable {
 	b := strings.Builder{}
-	printer.Fprint(&b, fset, v.Decl)
+	printerConf.Fprint(&b, fset, v.Decl)
 
 	return Variable{
 		Names: v.Names,
@@ -88,7 +91,7 @@ type Function struct {
 
 func NewFunction(fset *token.FileSet, f *doc.Func) Function {
 	b := strings.Builder{}
-	printer.Fprint(&b, fset, f.Decl)
+	printerConf.Fprint(&b, fset, f.Decl)
 
 	pos := fset.Position(f.Decl.Pos())
 
@@ -114,7 +117,7 @@ type Type struct {
 
 func NewType(fset *token.FileSet, t *doc.Type) Type {
 	b := strings.Builder{}
-	printer.Fprint(&b, fset, t.Decl)
+	printerConf.Fprint(&b, fset, t.Decl)
 
 	consts := []Variable{}
 	for _, c := range t.Consts {

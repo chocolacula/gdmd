@@ -1,10 +1,11 @@
 package main
 
 import (
-	"html/template"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 )
 
 func generateOne(root string, tmpl *template.Template, pkg *Package) {
@@ -25,7 +26,8 @@ func generateOne(root string, tmpl *template.Template, pkg *Package) {
 	}
 }
 
-func generate(root string, pkg *Package) {
+// Generate creates a markdown files for the given [Package] and its nested packages.
+func Generate(root string, pkg *Package) {
 	funcs := template.FuncMap{
 		"ToLower": strings.ToLower,
 	}
@@ -34,8 +36,7 @@ func generate(root string, pkg *Package) {
 		Funcs(funcs).
 		Parse(templateData)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-
 	generateOne(root, tmpl, pkg)
 }
