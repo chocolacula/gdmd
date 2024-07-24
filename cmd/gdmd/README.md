@@ -10,12 +10,16 @@ The single package in the project, contains data representation, parsing and gen
 - [Functions](#functions)
   - [func Generate](#func-generate)
 - [Types](#types)
-  - [type A](#type-a)
   - [type Function](#type-function)
+    - [func NewFunction](#func-newfunction)
   - [type Package](#type-package)
+    - [func NewPackage](#func-newpackage)
+    - [func Parse](#func-parse)
   - [type Position](#type-position)
   - [type Type](#type-type)
+    - [func NewType](#func-newtype)
   - [type Variable](#type-variable)
+    - [func NewVariable](#func-newvariable)
 - [Source files](#source-files)
 
 ## Variables
@@ -38,13 +42,6 @@ Generate creates a markdown files for the given [Package] and its nested package
 
 ## Types
 
-### type [A](./parse.go#L25)
-
-```go
-type A struct {
-}
-```
-
 ### type [Function](./types.go#L85)
 
 ```go
@@ -52,11 +49,18 @@ type Function struct {
   Doc       string
   Name      string
   Pos       Position
+  Recv      string // "" for functions, receiver name for methods
   Signature string
 }
 ```
 
 Function represents a function or method declaration.
+
+### func [NewFunction](./types.go#L93)
+
+```go
+func NewFunction(fset *token.FileSet, f *doc.Func) Function
+```
 
 ### type [Package](./types.go#L14)
 
@@ -76,6 +80,22 @@ type Package struct {
 
 Package represents a Go package with its contents.
 
+### func [NewPackage](./types.go#L26)
+
+```go
+func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Package, files []string) Package
+```
+
+### func [Parse](./parse.go#L28)
+
+```go
+func Parse(root, path string) (Package, error)
+```
+
+Parse walks the directory tree rooted at root and parses all .go files
+it returns a [Package] for each directory containing .go files
+or empty [Package] and [EmptyErr]
+
 ### type [Position](./types.go#L79)
 
 ```go
@@ -87,7 +107,7 @@ type Position struct {
 
 Position is a file name and line number of a declaration.
 
-### type [Type](./types.go#L107)
+### type [Type](./types.go#L114)
 
 ```go
 type Type struct {
@@ -104,6 +124,12 @@ type Type struct {
 
 Type is a struct or interface declaration.
 
+### func [NewType](./types.go#L125)
+
+```go
+func NewType(fset *token.FileSet, t *doc.Type) Type
+```
+
 ### type [Variable](./types.go#L61)
 
 ```go
@@ -116,6 +142,11 @@ type Variable struct {
 
 Variable represents constant or variable declarations within () or single one.
 
+### func [NewVariable](./types.go#L67)
+
+```go
+func NewVariable(fset *token.FileSet, v *doc.Value) Variable
+```
 
 ## Source files
 

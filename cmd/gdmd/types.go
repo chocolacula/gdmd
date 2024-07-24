@@ -86,6 +86,7 @@ type Function struct {
 	Doc       string
 	Name      string
 	Pos       Position
+	Recv      string // "" for functions, receiver name for methods
 	Signature string
 }
 
@@ -95,10 +96,16 @@ func NewFunction(fset *token.FileSet, f *doc.Func) Function {
 
 	pos := fset.Position(f.Decl.Pos())
 
+	recv := ""
+	if f.Decl.Recv != nil {
+		recv = f.Decl.Recv.List[0].Names[0].Name
+	}
+
 	return Function{
 		Doc:       f.Doc,
 		Name:      f.Name,
 		Pos:       Position{pos.Filename, pos.Line},
+		Recv:      recv,
 		Signature: b.String(),
 	}
 }
