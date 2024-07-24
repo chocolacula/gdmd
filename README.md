@@ -9,6 +9,20 @@ Standard for Go [pkg.go.dev](https://pkg.go.dev/) is awesome but not suitable fo
 With `gdmd` you don't even have to host your documentation, you can keep it in your repo along with the code. The generator creates a `README.md` with a package documentation in a package folder.  
 You can navigate in documentation right in GitHub UI, any open directory with source code will render it's documentation.
 
+## How to use
+
+First, you have to
+
+```sh
+go install github.com/chocolacula/gdmd/cmd/gdmd
+```
+
+Then generate documentation for packages in a directory and all subdirectories
+
+```sh
+gdmd ./directory
+```
+
 ## Example
 
 package `main`
