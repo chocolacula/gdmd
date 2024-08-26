@@ -25,7 +25,7 @@ func mustParse(fset *token.FileSet, filename string, src []byte) *ast.File {
 // Parse walks the directory tree rooted at root and parses all .go files
 // it returns a [Package] for each directory containing .go files
 // or empty [Package] and [EmptyErr]
-func Parse(root, path string) (Package, error) {
+func Parse(root, path string, recursive bool) (Package, error) {
 	ent, _ := os.ReadDir(filepath.Join(root, path))
 
 	fset := token.NewFileSet()
@@ -38,8 +38,8 @@ func Parse(root, path string) (Package, error) {
 	for _, e := range ent {
 		next := filepath.Join(path, e.Name())
 
-		if e.IsDir() {
-			pkg, err := Parse(root, next)
+		if e.IsDir() && recursive {
+			pkg, err := Parse(root, next, recursive)
 			if err == nil {
 				pkgs = append(pkgs, pkg)
 			} // else ignore error

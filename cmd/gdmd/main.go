@@ -5,10 +5,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const (
-	version = "0.0.0"
+	version = "0.1.0"
 	usage   = `usage: gdmd <directory>
 
 go doc markdown
@@ -21,8 +22,8 @@ func main() {
 		println(usage)
 		flag.PrintDefaults()
 	}
-	vFlag := flag.Bool("v", false, "print version")
 
+	vFlag := flag.Bool("v", false, "print version")
 	flag.Parse()
 
 	if *vFlag {
@@ -30,8 +31,15 @@ func main() {
 		return
 	}
 
-	args := os.Args
-	root, _ := filepath.Abs(args[1])
+	fset := flag.NewFlagSet("parse", flag.ExitOnError)
+	rFlag := fset.Bool("r", false, "recursive")
+
+	if !strings.HasPrefix(flag.Arg(0), "-") {
+		// cut of the directory argument
+		_ = fset.Parse(flag.Args()[1:])
+	}
+
+	root, _ := filepath.Abs(flag.Arg(0))
 
 	_, err := os.Stat(root)
 	if err != nil {
@@ -42,7 +50,7 @@ func main() {
 		}
 	}
 
-	pkg, err := Parse(root, "")
+	pkg, err := Parse(root, "", *rFlag)
 	if err != nil {
 		log.Fatal(err)
 	}

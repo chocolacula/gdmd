@@ -89,7 +89,7 @@ func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Packag
 ### func [Parse](./parse.go#L28)
 
 ```go
-func Parse(root, path string) (Package, error)
+func Parse(root, path string, recursive bool) (Package, error)
 ```
 
 Parse walks the directory tree rooted at root and parses all .go files
