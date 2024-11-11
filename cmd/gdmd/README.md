@@ -38,7 +38,7 @@ var EmptyErr = errors.New("empty folder")
 func Generate(root string, pkg *Package)
 ```
 
-Generate creates a markdown files for the given [Package] and its nested packages.
+Generate creates markdown files for the given [Package] and its nested packages.
 
 ## Types
 

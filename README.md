@@ -56,7 +56,7 @@ var EmptyErr = errors.New("empty folder")
 func Generate(root string, pkg *Package)
 ```
 
-Generate creates a markdown files for the given [Package] and its nested packages.
+Generate creates markdown files for the given [Package] and its nested packages.
 
 ## Types
 
@@ -80,4 +80,4 @@ Function represents a function or method declaration.
 func NewFunction(fset *token.FileSet, f *doc.Func) Function
 ```
 
-> You can compare [self-generated](cmd/gdmd/README.md) with [pkg.dev](https://pkg.go.dev/github.com/chocolacula/gdmd) documentation.
+> You can compare [self-generated](cmd/gdmd/README.md) documentation with [pkg.dev](https://pkg.go.dev/github.com/chocolacula/gdmd).

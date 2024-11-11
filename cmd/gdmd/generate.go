@@ -26,7 +26,7 @@ func generateOne(root string, tmpl *template.Template, pkg *Package) {
 	}
 }
 
-// Generate creates a markdown files for the given [Package] and its nested packages.
+// Generate creates markdown files for the given [Package] and its nested packages.
 func Generate(root string, pkg *Package) {
 	funcs := template.FuncMap{
 		"ToLower": strings.ToLower,
