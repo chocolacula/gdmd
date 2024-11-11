@@ -18,15 +18,15 @@ package `{{ .Name }}`
 {{ end -}}
 {{ if .Functions -}}
 - [Functions](#functions)
-{{ range .Functions }}  - [func {{ .Name }}](#func-{{ .Name | ToLower }})
+{{ range .Functions }}  - [{{ .Signature }}](#func-{{ .Name | ToLower }})
 {{ end -}}
 {{ end -}}
 {{ if .Types -}}
 - [Types](#types)
 {{ range .Types }}  - [type {{ .Name }}](#type-{{ .Name | ToLower }})
-{{ range .Functions }}    - [func {{ .Name }}](#func-{{ .Name | ToLower }})
+{{ range .Functions }}    - [{{ .Signature }}](#func-{{ .Name | ToLower }})
 {{ end -}}
-{{ range .Methods }}    - [func ({{ .Recv }}) {{ .Name }}](#func-{{ .Recv | ToLower }}-{{ .Name | ToLower }})
+{{ range .Methods }}    - [{{ .Signature }}](#func-{{ .Recv | ToLower }}-{{ .Name | ToLower }})
 {{ end -}}
 {{ end -}}
 {{ end -}}

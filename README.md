@@ -19,7 +19,7 @@ First, you have to
 go install github.com/chocolacula/gdmd/cmd/gdmd
 ```
 
-Then generate documentation for packages in a directory and all subdirectories
+Then generate documentation for a package in a directory
 
 ```sh
 gdmd ./directory
@@ -31,16 +31,16 @@ package `main`
 
 The single package in the project, contains data representation, parsing and generation logic.
 
-### Index
+## Index
 
 - [Variables](#variables)
 - [Functions](#functions)
-  - [func Generate](#func-generate)
+  - [func Generate(root string, pkg *Package)](#func-generate)
 - [Types](#types)
   - [type Function](#type-function)
-    - [func NewFunction](#func-newfunction)
+    - [func NewFunction(fset *token.FileSet, f *doc.Func) Function](#func-newfunction)
 
-### Variables
+## Variables
 
 Simple error to indicate empty folder
 
@@ -48,9 +48,9 @@ Simple error to indicate empty folder
 var EmptyErr = errors.New("empty folder")
 ```
 
-### Functions
+## Functions
 
-#### func [Generate](./cmd/gdmd/generate.go#L30)
+### func [Generate](./generate.go#L30)
 
 ```go
 func Generate(root string, pkg *Package)
@@ -58,9 +58,9 @@ func Generate(root string, pkg *Package)
 
 Generate creates a markdown files for the given [Package] and its nested packages.
 
-### Types
+## Types
 
-#### type [Function](./cmd/gdmd/types.go#L85)
+### type [Function](./types.go#L85)
 
 ```go
 type Function struct {
@@ -74,10 +74,10 @@ type Function struct {
 
 Function represents a function or method declaration.
 
-#### func [NewFunction](./cmd/gdmd/types.go#L93)
+### func [NewFunction](./types.go#L93)
 
 ```go
 func NewFunction(fset *token.FileSet, f *doc.Func) Function
 ```
 
-> You can compare full [self-generated](cmd/gdmd/README.md) and [pkg.dev](https://pkg.go.dev/github.com/chocolacula/gdmd) documentation.
+> You can compare [self-generated](cmd/gdmd/README.md) with [pkg.dev](https://pkg.go.dev/github.com/chocolacula/gdmd) documentation.
