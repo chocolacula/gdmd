@@ -153,6 +153,5 @@ func NewVariable(fset *token.FileSet, v *doc.Value) Variable
 [generate.go](./generate.go)
 [main.go](./main.go)
 [parse.go](./parse.go)
-[parse_test.go](./parse_test.go)
 [template.go](./template.go)
 [types.go](./types.go)

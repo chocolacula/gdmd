@@ -9,8 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/chocolacula/gdmd/pkg/hidden"
 )
 
 // Simple error to indicate empty folder
@@ -38,12 +36,13 @@ func Parse(root, path string, recursive bool) (Package, error) {
 	fnames := []string{}
 
 	for _, e := range entries {
-		nextPath := filepath.Join(path, e.Name())
-
-		// file or directory
-		if hidden.Hidden(nextPath) {
+		// Hidden file or directory. The Go compiler behaves consistently across Windows and Posix.
+		// It skips files and directories that begin with '.' but ignores hidden attribute in Windows.
+		if strings.HasPrefix(e.Name(), ".") {
 			continue
 		}
+
+		nextPath := filepath.Join(path, e.Name())
 
 		if e.IsDir() && recursive {
 			pkg, err := Parse(root, nextPath, recursive)
@@ -51,7 +50,8 @@ func Parse(root, path string, recursive bool) (Package, error) {
 				pkgs = append(pkgs, pkg)
 			} // else ignore error
 		} else {
-			if !strings.HasSuffix(e.Name(), ".go") {
+			if !strings.HasSuffix(e.Name(), ".go") ||
+				strings.HasSuffix(e.Name(), "_test.go") {
 				continue
 			}
 			fnames = append(fnames, e.Name())
