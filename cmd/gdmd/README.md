@@ -86,7 +86,7 @@ Package represents a Go package with its contents.
 func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Package, files []string) Package
 ```
 
-### func [Parse](./parse.go#L28)
+### func [Parse](./parse.go#L30)
 
 ```go
 func Parse(root, path string, recursive bool) (Package, error)
@@ -153,5 +153,6 @@ func NewVariable(fset *token.FileSet, v *doc.Value) Variable
 [generate.go](./generate.go)
 [main.go](./main.go)
 [parse.go](./parse.go)
+[parse_test.go](./parse_test.go)
 [template.go](./template.go)
 [types.go](./types.go)
