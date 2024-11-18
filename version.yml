@@ -1,0 +1,7 @@
+version: 0.1.2
+
+template: "$major.$minor.$patch"
+
+source:
+  - file: ./cmd/gdmd/main.go
+    template: version = "$version"

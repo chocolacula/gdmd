@@ -26,7 +26,7 @@ func mustParse(fset *token.FileSet, filename string, src []byte) *ast.File {
 // it returns a [Package] for each directory containing .go files
 // or empty [Package] and [EmptyErr]
 func Parse(root, path string, recursive bool) (Package, error) {
-	ent, _ := os.ReadDir(filepath.Join(root, path))
+	entries, _ := os.ReadDir(filepath.Join(root, path))
 
 	fset := token.NewFileSet()
 
@@ -35,21 +35,28 @@ func Parse(root, path string, recursive bool) (Package, error) {
 	pkgs := []Package{}
 	fnames := []string{}
 
-	for _, e := range ent {
-		next := filepath.Join(path, e.Name())
+	for _, e := range entries {
+		// Hidden file or directory. The Go compiler behaves consistently across Windows and Posix.
+		// It skips files and directories that begin with '.' but ignores hidden attribute in Windows.
+		if strings.HasPrefix(e.Name(), ".") {
+			continue
+		}
+
+		nextPath := filepath.Join(path, e.Name())
 
 		if e.IsDir() && recursive {
-			pkg, err := Parse(root, next, recursive)
+			pkg, err := Parse(root, nextPath, recursive)
 			if err == nil {
 				pkgs = append(pkgs, pkg)
 			} // else ignore error
 		} else {
-			if !strings.HasSuffix(e.Name(), ".go") {
+			if !strings.HasSuffix(e.Name(), ".go") ||
+				strings.HasSuffix(e.Name(), "_test.go") {
 				continue
 			}
 			fnames = append(fnames, e.Name())
 
-			src, _ := os.ReadFile(filepath.Join(root, next))
+			src, _ := os.ReadFile(filepath.Join(root, nextPath))
 			files = append(files, mustParse(fset, e.Name(), src))
 		}
 	}
