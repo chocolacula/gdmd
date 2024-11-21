@@ -1,42 +1,37 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
+
+	flag "github.com/spf13/pflag"
 )
 
 const (
-	version = "0.1.2"
-	usage   = `usage: gdmd <directory>
+	version = "0.1.3"
+	usage   = `usage: gdmd [options] <directory>
 
-go doc markdown
+go doc markdown generator
 
 options:`
 )
 
 func main() {
-	flag.Usage = func() {
-		println(usage)
-		flag.PrintDefaults()
-	}
+	hFlag := flag.BoolP("help", "h", false, "print this help message")
+	vFlag := flag.BoolP("version", "v", false, "print version")
+	rFlag := flag.BoolP("recursive", "r", false, "walk directories recursively")
 
-	vFlag := flag.Bool("v", false, "print version")
 	flag.Parse()
 
+	if *hFlag {
+		println(usage)
+		flag.PrintDefaults()
+		return
+	}
 	if *vFlag {
 		println(version)
 		return
-	}
-
-	fset := flag.NewFlagSet("parse", flag.ExitOnError)
-	rFlag := fset.Bool("r", false, "recursive")
-
-	if !strings.HasPrefix(flag.Arg(0), "-") {
-		// cut of the directory argument
-		_ = fset.Parse(flag.Args()[1:])
 	}
 
 	root, _ := filepath.Abs(flag.Arg(0))
