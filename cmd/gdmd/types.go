@@ -23,25 +23,41 @@ type Package struct {
 	Files     []string
 }
 
-func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Package, files []string) Package {
+func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Package, files []string) (Package, error) {
 	consts := []Variable{}
 	for _, c := range p.Consts {
-		consts = append(consts, NewVariable(fset, c))
+		nc, err := NewVariable(fset, c)
+		if err != nil {
+			return Package{}, err
+		}
+		consts = append(consts, nc)
 	}
 
 	vars := []Variable{}
 	for _, v := range p.Vars {
-		vars = append(vars, NewVariable(fset, v))
+		nv, err := NewVariable(fset, v)
+		if err != nil {
+			return Package{}, err
+		}
+		vars = append(vars, nv)
 	}
 
 	funcs := []Function{}
 	for _, f := range p.Funcs {
-		funcs = append(funcs, NewFunction(fset, f))
+		nf, err := NewFunction(fset, f)
+		if err != nil {
+			return Package{}, err
+		}
+		funcs = append(funcs, nf)
 	}
 
 	types := []Type{}
 	for _, t := range p.Types {
-		types = append(types, NewType(fset, t))
+		nt, err := NewType(fset, t)
+		if err != nil {
+			return Package{}, err
+		}
+		types = append(types, nt)
 	}
 
 	return Package{
@@ -54,7 +70,7 @@ func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Packag
 		Types:     types,
 		Nested:    nested,
 		Files:     files,
-	}
+	}, nil
 }
 
 // Variable represents constant or variable declarations within () or single one.
@@ -64,15 +80,18 @@ type Variable struct {
 	Src   string // piece of source code with the declaration
 }
 
-func NewVariable(fset *token.FileSet, v *doc.Value) Variable {
+func NewVariable(fset *token.FileSet, v *doc.Value) (Variable, error) {
 	b := strings.Builder{}
-	printerConf.Fprint(&b, fset, v.Decl)
+	err := printerConf.Fprint(&b, fset, v.Decl)
+	if err != nil {
+		return Variable{}, err
+	}
 
 	return Variable{
 		Names: v.Names,
 		Doc:   v.Doc,
 		Src:   b.String(),
-	}
+	}, nil
 }
 
 // Position is a file name and line number of a declaration.
@@ -90,10 +109,12 @@ type Function struct {
 	Signature string
 }
 
-func NewFunction(fset *token.FileSet, f *doc.Func) Function {
+func NewFunction(fset *token.FileSet, f *doc.Func) (Function, error) {
 	b := strings.Builder{}
-	printerConf.Fprint(&b, fset, f.Decl)
-
+	err := printerConf.Fprint(&b, fset, f.Decl)
+	if err != nil {
+		return Function{}, err
+	}
 	pos := fset.Position(f.Decl.Pos())
 
 	recv := ""
@@ -107,7 +128,7 @@ func NewFunction(fset *token.FileSet, f *doc.Func) Function {
 		Pos:       Position{pos.Filename, pos.Line},
 		Recv:      recv,
 		Signature: b.String(),
-	}
+	}, nil
 }
 
 // Type is a struct or interface declaration.
@@ -122,28 +143,46 @@ type Type struct {
 	Methods   []Function
 }
 
-func NewType(fset *token.FileSet, t *doc.Type) Type {
+func NewType(fset *token.FileSet, t *doc.Type) (Type, error) {
 	b := strings.Builder{}
-	printerConf.Fprint(&b, fset, t.Decl)
-
+	err := printerConf.Fprint(&b, fset, t.Decl)
+	if err != nil {
+		return Type{}, err
+	}
 	consts := []Variable{}
 	for _, c := range t.Consts {
-		consts = append(consts, NewVariable(fset, c))
+		nc, err := NewVariable(fset, c)
+		if err != nil {
+			return Type{}, err
+		}
+		consts = append(consts, nc)
 	}
 
 	vars := []Variable{}
 	for _, v := range t.Vars {
-		vars = append(vars, NewVariable(fset, v))
+		nv, err := NewVariable(fset, v)
+		if err != nil {
+			return Type{}, err
+		}
+		vars = append(vars, nv)
 	}
 
 	funcs := []Function{}
 	for _, f := range t.Funcs {
-		funcs = append(funcs, NewFunction(fset, f))
+		nf, err := NewFunction(fset, f)
+		if err != nil {
+			return Type{}, err
+		}
+		funcs = append(funcs, nf)
 	}
 
 	methods := []Function{}
 	for _, m := range t.Methods {
-		methods = append(methods, NewFunction(fset, m))
+		nm, err := NewFunction(fset, m)
+		if err != nil {
+			return Type{}, err
+		}
+		methods = append(methods, nm)
 	}
 
 	pos := fset.Position(t.Decl.Pos())
@@ -157,5 +196,5 @@ func NewType(fset *token.FileSet, t *doc.Type) Type {
 		Variables: vars,
 		Functions: funcs,
 		Methods:   methods,
-	}
+	}, nil
 }
