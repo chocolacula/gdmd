@@ -16,7 +16,7 @@ You can navigate through the documentation right in GitHub UI, any open director
 First, you have to
 
 ```sh
-go install github.com/chocolacula/gdmd/cmd/gdmd
+go install github.com/chocolacula/gdmd/cmd/gdmd@latest
 ```
 
 Then generate documentation for a package in a directory
