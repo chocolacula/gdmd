@@ -2,7 +2,7 @@
 
 package `main`
 
-The single package in the project, contains data representation, parsing and generation logic.
+The single package in the project, contains data representation, parsing, and generation logic.
 
 ## Index
 
@@ -38,7 +38,7 @@ var EmptyErr = errors.New("empty folder")
 func Generate(root string, pkg *Package)
 ```
 
-Generate creates markdown files for the given [Package] and its nested packages.
+Generate creates Markdown files for the given [Package] and its nested packages.
 
 ## Types
 

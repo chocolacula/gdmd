@@ -12,7 +12,7 @@ const (
 	version = "0.1.3"
 	usage   = `usage: gdmd [options] <directory>
 
-go doc markdown generator
+go doc Markdown generator
 
 options:`
 )

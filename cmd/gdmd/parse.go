@@ -36,8 +36,8 @@ func Parse(root, path string, recursive bool) (Package, error) {
 	fnames := []string{}
 
 	for _, e := range entries {
-		// Hidden file or directory. The Go compiler behaves consistently across Windows and Posix.
-		// It skips files and directories that begin with '.' but ignores hidden attribute in Windows.
+		// Hidden file or directory. The Go compiler behaves consistently across Windows and POSIX.
+		// It skips files and directories that begin with '.' but ignores hidden attribute on Windows.
 		if strings.HasPrefix(e.Name(), ".") {
 			continue
 		}
