@@ -18,6 +18,10 @@ jobs:
           ref: main
           fetch-depth: 0 # we need all history to get tags and analyze commits
 
+      - run: |
+          git config user.name "Maxim Voloshin"
+          git config user.email "mvolloshin@gmail.com"
+
       - name: Install verbum
         run: |
           python3 -m venv .venv

@@ -1,6 +1,10 @@
 # Go Doc Markdown
 
-godoc alternative for static Markdown documentation.
+[![lint](https://github.com/chocolacula/gdmd/actions/workflows/lint.yml/badge.svg)](https://github.com/chocolacula/gdmd/actions/workflows/lint.yml)
+[![test](https://github.com/chocolacula/gdmd/actions/workflows/test.yml/badge.svg)](https://github.com/chocolacula/gdmd/actions/workflows/test.yml)
+[![godoc](https://godoc.org/github.com/chocolacula/gdmd?status.svg)](https://godoc.org/github.com/chocolacula/gdmd)
+
+`godoc` alternative for static Markdown documentation.
 
 ## Motivation
 
