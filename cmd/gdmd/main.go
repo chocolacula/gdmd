@@ -40,14 +40,16 @@ func main() {
 	if err != nil {
 		if os.IsNotExist(err) {
 			log.Fatalf("directory %s does not exist", root)
-		} else {
-			log.Fatal(err)
 		}
+		log.Fatal(err)
 	}
 
 	pkg, err := Parse(root, "", *rFlag)
 	if err != nil {
 		log.Fatal(err)
 	}
-	Generate(root, &pkg)
+	err = Generate(root, &pkg)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

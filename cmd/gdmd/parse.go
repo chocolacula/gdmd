@@ -11,8 +11,8 @@ import (
 	"strings"
 )
 
-// Simple error to indicate empty folder
-var EmptyErr = errors.New("empty folder")
+// ErrEmpty sentinel indicating empty folder
+var ErrEmpty = errors.New("empty folder")
 
 func mustParse(fset *token.FileSet, filename string, src []byte) *ast.File {
 	f, err := parser.ParseFile(fset, filename, src, parser.ParseComments)
@@ -24,7 +24,7 @@ func mustParse(fset *token.FileSet, filename string, src []byte) *ast.File {
 
 // Parse walks the directory tree rooted at root and parses all .go files
 // it returns a [Package] for each directory containing .go files
-// or empty [Package] and [EmptyErr]
+// or empty [Package] and [ErrEmpty]
 func Parse(root, path string, recursive bool) (Package, error) {
 	entries, _ := os.ReadDir(filepath.Join(root, path))
 
@@ -66,7 +66,7 @@ func Parse(root, path string, recursive bool) (Package, error) {
 		return Package{}, err
 	}
 	if len(fnames) == 0 && len(pkgs) == 0 {
-		return Package{}, EmptyErr
+		return Package{}, ErrEmpty
 	}
-	return NewPackage(fset, p, path, pkgs, fnames), nil
+	return NewPackage(fset, p, path, pkgs, fnames)
 }
