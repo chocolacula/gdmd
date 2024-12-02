@@ -1,0 +1,30 @@
+name: bump
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-24.04
+    if: ${{ ! startsWith(github.event.head_commit.message, 'Version bumped') }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0 # we need all history to get tags and analyze commits
+
+      - name: Install verbum
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install git+https://github.com/chocolacula/verbum.git
+
+      - name: Bump version
+        run: |
+          source .venv/bin/activate
+          verbum up auto --commit --tag --push
