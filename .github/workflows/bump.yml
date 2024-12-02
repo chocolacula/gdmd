@@ -9,11 +9,12 @@ permissions:
 
 jobs:
   bump:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-lastest
     if: ${{ ! startsWith(github.event.head_commit.message, 'Version bumped') }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0 # we need all history to get tags and analyze commits
