@@ -1,5 +1,7 @@
 # Overview
 
+[![GoDoc](https://godoc.org/github.com/chocolacula/gdmd?status.svg)](https://godoc.org/github.com/chocolacula/gdmd)
+
 package `main`
 
 The single package in the project, contains data representation, parsing, and generation logic.
