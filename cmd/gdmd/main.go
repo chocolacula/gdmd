@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	version = "0.1.3"
+	version = "0.1.4"
 	usage   = `usage: gdmd [options] <directory>
 
 go doc Markdown generator
