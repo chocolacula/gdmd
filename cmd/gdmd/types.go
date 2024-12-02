@@ -1,4 +1,4 @@
-// The single package in the project, contains data representation, parsing and generation logic.
+// The single package in the project, contains data representation, parsing, and generation logic.
 package main
 
 import (
