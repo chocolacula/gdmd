@@ -24,12 +24,20 @@ type Package struct {
 	Files     []string
 }
 
+type packageHelper struct {
+	fileset       *token.FileSet
+	commentParser *comment.Parser
+}
+
 func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Package, files []string) (Package, error) {
-	cp := p.Parser()
+	ph := packageHelper{
+		fileset:       fset,
+		commentParser: p.Parser(),
+	}
 
 	consts := []Variable{}
 	for _, c := range p.Consts {
-		nc, err := NewVariable(cp, fset, c)
+		nc, err := ph.NewVariable(c)
 		if err != nil {
 			return Package{}, err
 		}
@@ -39,7 +47,7 @@ func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Packag
 
 	vars := []Variable{}
 	for _, v := range p.Vars {
-		nv, err := NewVariable(cp, fset, v)
+		nv, err := ph.NewVariable(v)
 		if err != nil {
 			return Package{}, err
 		}
@@ -49,7 +57,7 @@ func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Packag
 
 	funcs := []Function{}
 	for _, f := range p.Funcs {
-		nf, err := NewFunction(cp, fset, f)
+		nf, err := ph.NewFunction(f)
 		if err != nil {
 			return Package{}, err
 		}
@@ -59,7 +67,7 @@ func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Packag
 
 	types := []Type{}
 	for _, t := range p.Types {
-		nt, err := NewType(cp, fset, t)
+		nt, err := ph.NewType(t)
 		if err != nil {
 			return Package{}, err
 		}
@@ -86,7 +94,9 @@ type Variable struct {
 	Src   string // piece of source code with the declaration
 }
 
-func NewVariable(cp *comment.Parser, fset *token.FileSet, v *doc.Value) (Variable, error) {
+func (ph *packageHelper) NewVariable(v *doc.Value) (Variable, error) {
+	fset := ph.fileset
+
 	b := strings.Builder{}
 	err := printerConf.Fprint(&b, fset, v.Decl)
 	if err != nil {
@@ -95,7 +105,7 @@ func NewVariable(cp *comment.Parser, fset *token.FileSet, v *doc.Value) (Variabl
 
 	return Variable{
 		Names: v.Names,
-		Doc:   computeLinks(cp, v.Doc),
+		Doc:   ph.computeLinks(v.Doc),
 		Src:   b.String(),
 	}, nil
 }
@@ -115,7 +125,9 @@ type Function struct {
 	Signature string
 }
 
-func NewFunction(cp *comment.Parser, fset *token.FileSet, f *doc.Func) (Function, error) {
+func (ph *packageHelper) NewFunction(f *doc.Func) (Function, error) {
+	fset := ph.fileset
+
 	b := strings.Builder{}
 	err := printerConf.Fprint(&b, fset, f.Decl)
 	if err != nil {
@@ -129,7 +141,7 @@ func NewFunction(cp *comment.Parser, fset *token.FileSet, f *doc.Func) (Function
 	}
 
 	return Function{
-		Doc:       computeLinks(cp, f.Doc),
+		Doc:       ph.computeLinks(f.Doc),
 		Name:      f.Name,
 		Pos:       Position{pos.Filename, pos.Line},
 		Recv:      recv,
@@ -149,7 +161,9 @@ type Type struct {
 	Methods   []Function
 }
 
-func NewType(cp *comment.Parser, fset *token.FileSet, t *doc.Type) (Type, error) {
+func (ph *packageHelper) NewType(t *doc.Type) (Type, error) {
+	fset := ph.fileset
+
 	b := strings.Builder{}
 	err := printerConf.Fprint(&b, fset, t.Decl)
 	if err != nil {
@@ -157,7 +171,7 @@ func NewType(cp *comment.Parser, fset *token.FileSet, t *doc.Type) (Type, error)
 	}
 	consts := []Variable{}
 	for _, c := range t.Consts {
-		nc, err := NewVariable(cp, fset, c)
+		nc, err := ph.NewVariable(c)
 		if err != nil {
 			return Type{}, err
 		}
@@ -166,7 +180,7 @@ func NewType(cp *comment.Parser, fset *token.FileSet, t *doc.Type) (Type, error)
 
 	vars := []Variable{}
 	for _, v := range t.Vars {
-		nv, err := NewVariable(cp, fset, v)
+		nv, err := ph.NewVariable(v)
 		if err != nil {
 			return Type{}, err
 		}
@@ -175,7 +189,7 @@ func NewType(cp *comment.Parser, fset *token.FileSet, t *doc.Type) (Type, error)
 
 	funcs := []Function{}
 	for _, f := range t.Funcs {
-		nf, err := NewFunction(cp, fset, f)
+		nf, err := ph.NewFunction(f)
 		if err != nil {
 			return Type{}, err
 		}
@@ -184,7 +198,7 @@ func NewType(cp *comment.Parser, fset *token.FileSet, t *doc.Type) (Type, error)
 
 	methods := []Function{}
 	for _, m := range t.Methods {
-		nm, err := NewFunction(cp, fset, m)
+		nm, err := ph.NewFunction(m)
 		if err != nil {
 			return Type{}, err
 		}
@@ -206,8 +220,8 @@ func NewType(cp *comment.Parser, fset *token.FileSet, t *doc.Type) (Type, error)
 }
 
 // computeLinks adds markdown links to the documentation.
-func computeLinks(p *comment.Parser, s string) string {
-	docComment := p.Parse(s)
+func (ph packageHelper) computeLinks(s string) string {
+	docComment := ph.commentParser.Parse(s)
 	cp := comment.Printer{
 		DocLinkURL: func(link *comment.DocLink) string {
 			if link.ImportPath == "" {
