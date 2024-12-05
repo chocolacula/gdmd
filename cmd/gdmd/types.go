@@ -3,6 +3,7 @@ package main
 
 import (
 	"go/doc"
+	"go/doc/comment"
 	"go/printer"
 	"go/token"
 	"strings"
@@ -24,36 +25,41 @@ type Package struct {
 }
 
 func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Package, files []string) (Package, error) {
+	cp := p.Parser()
+
 	consts := []Variable{}
 	for _, c := range p.Consts {
-		nc, err := NewVariable(fset, c)
+		nc, err := NewVariable(cp, fset, c)
 		if err != nil {
 			return Package{}, err
 		}
+
 		consts = append(consts, nc)
 	}
 
 	vars := []Variable{}
 	for _, v := range p.Vars {
-		nv, err := NewVariable(fset, v)
+		nv, err := NewVariable(cp, fset, v)
 		if err != nil {
 			return Package{}, err
 		}
+
 		vars = append(vars, nv)
 	}
 
 	funcs := []Function{}
 	for _, f := range p.Funcs {
-		nf, err := NewFunction(fset, f)
+		nf, err := NewFunction(cp, fset, f)
 		if err != nil {
 			return Package{}, err
 		}
+
 		funcs = append(funcs, nf)
 	}
 
 	types := []Type{}
 	for _, t := range p.Types {
-		nt, err := NewType(fset, t)
+		nt, err := NewType(cp, fset, t)
 		if err != nil {
 			return Package{}, err
 		}
@@ -80,7 +86,7 @@ type Variable struct {
 	Src   string // piece of source code with the declaration
 }
 
-func NewVariable(fset *token.FileSet, v *doc.Value) (Variable, error) {
+func NewVariable(cp *comment.Parser, fset *token.FileSet, v *doc.Value) (Variable, error) {
 	b := strings.Builder{}
 	err := printerConf.Fprint(&b, fset, v.Decl)
 	if err != nil {
@@ -89,7 +95,7 @@ func NewVariable(fset *token.FileSet, v *doc.Value) (Variable, error) {
 
 	return Variable{
 		Names: v.Names,
-		Doc:   v.Doc,
+		Doc:   computeLinks(cp, v.Doc),
 		Src:   b.String(),
 	}, nil
 }
@@ -109,7 +115,7 @@ type Function struct {
 	Signature string
 }
 
-func NewFunction(fset *token.FileSet, f *doc.Func) (Function, error) {
+func NewFunction(cp *comment.Parser, fset *token.FileSet, f *doc.Func) (Function, error) {
 	b := strings.Builder{}
 	err := printerConf.Fprint(&b, fset, f.Decl)
 	if err != nil {
@@ -123,7 +129,7 @@ func NewFunction(fset *token.FileSet, f *doc.Func) (Function, error) {
 	}
 
 	return Function{
-		Doc:       f.Doc,
+		Doc:       computeLinks(cp, f.Doc),
 		Name:      f.Name,
 		Pos:       Position{pos.Filename, pos.Line},
 		Recv:      recv,
@@ -143,7 +149,7 @@ type Type struct {
 	Methods   []Function
 }
 
-func NewType(fset *token.FileSet, t *doc.Type) (Type, error) {
+func NewType(cp *comment.Parser, fset *token.FileSet, t *doc.Type) (Type, error) {
 	b := strings.Builder{}
 	err := printerConf.Fprint(&b, fset, t.Decl)
 	if err != nil {
@@ -151,7 +157,7 @@ func NewType(fset *token.FileSet, t *doc.Type) (Type, error) {
 	}
 	consts := []Variable{}
 	for _, c := range t.Consts {
-		nc, err := NewVariable(fset, c)
+		nc, err := NewVariable(cp, fset, c)
 		if err != nil {
 			return Type{}, err
 		}
@@ -160,7 +166,7 @@ func NewType(fset *token.FileSet, t *doc.Type) (Type, error) {
 
 	vars := []Variable{}
 	for _, v := range t.Vars {
-		nv, err := NewVariable(fset, v)
+		nv, err := NewVariable(cp, fset, v)
 		if err != nil {
 			return Type{}, err
 		}
@@ -169,7 +175,7 @@ func NewType(fset *token.FileSet, t *doc.Type) (Type, error) {
 
 	funcs := []Function{}
 	for _, f := range t.Funcs {
-		nf, err := NewFunction(fset, f)
+		nf, err := NewFunction(cp, fset, f)
 		if err != nil {
 			return Type{}, err
 		}
@@ -178,7 +184,7 @@ func NewType(fset *token.FileSet, t *doc.Type) (Type, error) {
 
 	methods := []Function{}
 	for _, m := range t.Methods {
-		nm, err := NewFunction(fset, m)
+		nm, err := NewFunction(cp, fset, m)
 		if err != nil {
 			return Type{}, err
 		}
@@ -197,4 +203,31 @@ func NewType(fset *token.FileSet, t *doc.Type) (Type, error) {
 		Functions: funcs,
 		Methods:   methods,
 	}, nil
+}
+
+// computeLinks adds markdown links to the documentation.
+func computeLinks(p *comment.Parser, s string) string {
+	docComment := p.Parse(s)
+	cp := comment.Printer{
+		DocLinkURL: func(link *comment.DocLink) string {
+			if link.ImportPath == "" {
+				// TODO: add link to current package, for now they will have no links
+				return ""
+			}
+
+			first, _, _ := strings.Cut(link.ImportPath, "/")
+			if strings.Contains(first, ".") {
+				// this is supposed to catch github.com, gitlab.com but also all vanity URLs
+
+				// here we are assuming that documentation is public
+				// TODO: add support for private documentation by checking if import path is part of the current module
+
+				return link.DefaultURL("https://pkg.go.dev/")
+			}
+
+			// TODO: sort what to do with relative import paths, for now they will have no links
+			return ""
+		},
+	}
+	return string(cp.Markdown(docComment))
 }
