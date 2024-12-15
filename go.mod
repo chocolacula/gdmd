@@ -2,6 +2,10 @@ module github.com/chocolacula/gdmd
 
 go 1.22.0
 
+retract (
+	v0.1.4
+)
+
 require github.com/stretchr/testify v1.10.0
 
 require (

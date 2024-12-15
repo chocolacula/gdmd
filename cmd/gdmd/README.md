@@ -42,7 +42,7 @@ Generate creates Markdown files for the given [Package] and its nested packages.
 
 ## Types
 
-### type [Function](./types.go#L104)
+### type [Function](./types.go#L105)
 
 ```go
 type Function struct {
@@ -56,13 +56,13 @@ type Function struct {
 
 Function represents a function or method declaration.
 
-### func [NewFunction](./types.go#L112)
+### func [NewFunction](./types.go#L113)
 
 ```go
 func NewFunction(fset *token.FileSet, f *doc.Func) (Function, error)
 ```
 
-### type [Package](./types.go#L14)
+### type [Package](./types.go#L15)
 
 ```go
 type Package struct {
@@ -80,7 +80,7 @@ type Package struct {
 
 Package represents a Go package with its contents.
 
-### func [NewPackage](./types.go#L26)
+### func [NewPackage](./types.go#L27)
 
 ```go
 func NewPackage(fset *token.FileSet, p *doc.Package, dir string, nested []Package, files []string) (Package, error)
@@ -96,7 +96,7 @@ Parse walks the directory tree rooted at root and parses all .go files
 it returns a [Package] for each directory containing .go files
 or empty [Package] and [ErrEmpty]
 
-### type [Position](./types.go#L98)
+### type [Position](./types.go#L99)
 
 ```go
 type Position struct {
@@ -107,7 +107,7 @@ type Position struct {
 
 Position is a file name and line number of a declaration.
 
-### type [Type](./types.go#L135)
+### type [Type](./types.go#L151)
 
 ```go
 type Type struct {
@@ -124,13 +124,13 @@ type Type struct {
 
 Type is a struct or interface declaration.
 
-### func [NewType](./types.go#L146)
+### func [NewType](./types.go#L162)
 
 ```go
 func NewType(fset *token.FileSet, t *doc.Type) (Type, error)
 ```
 
-### type [Variable](./types.go#L77)
+### type [Variable](./types.go#L78)
 
 ```go
 type Variable struct {
@@ -142,7 +142,7 @@ type Variable struct {
 
 Variable represents constant or variable declarations within () or single one.
 
-### func [NewVariable](./types.go#L83)
+### func [NewVariable](./types.go#L84)
 
 ```go
 func NewVariable(fset *token.FileSet, v *doc.Value) (Variable, error)

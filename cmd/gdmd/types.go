@@ -2,6 +2,7 @@
 package main
 
 import (
+	"go/ast"
 	"go/doc"
 	"go/printer"
 	"go/token"
@@ -110,24 +111,39 @@ type Function struct {
 }
 
 func NewFunction(fset *token.FileSet, f *doc.Func) (Function, error) {
-	b := strings.Builder{}
-	err := printerConf.Fprint(&b, fset, f.Decl)
+	sig := strings.Builder{}
+	err := printerConf.Fprint(&sig, fset, f.Decl)
 	if err != nil {
 		return Function{}, err
 	}
 	pos := fset.Position(f.Decl.Pos())
 
-	recv := ""
-	if f.Decl.Recv != nil {
-		recv = f.Decl.Recv.List[0].Names[0].Name
+	recv := strings.Builder{}
+	if f.Decl.Recv != nil && len(f.Decl.Recv.List) > 0 {
+		r := f.Decl.Recv.List[0]
+		if len(r.Names) > 0 {
+			recv.WriteString(r.Names[0].Name)
+			recv.WriteByte(' ')
+		}
+		if r.Type != nil {
+			switch t := r.Type.(type) {
+			case *ast.Ident:
+				recv.WriteString(t.Name)
+			case *ast.StarExpr:
+				recv.WriteByte('*')
+				recv.WriteString(t.X.(*ast.Ident).Name)
+			default:
+				panic("unsupported receiver type")
+			}
+		}
 	}
 
 	return Function{
 		Doc:       f.Doc,
 		Name:      f.Name,
 		Pos:       Position{pos.Filename, pos.Line},
-		Recv:      recv,
-		Signature: b.String(),
+		Recv:      recv.String(),
+		Signature: sig.String(),
 	}, nil
 }
 

@@ -31,8 +31,12 @@ func generateOne(root string, tmpl *template.Template, pkg *Package) error {
 
 // Generate creates Markdown files for the given [Package] and its nested packages.
 func Generate(root string, pkg *Package) error {
+	replacer := strings.NewReplacer(" ", "-", "*", "")
 	funcs := template.FuncMap{
-		"ToLower": strings.ToLower,
+		"ToSlug": func(s string) string {
+			s = replacer.Replace(s)
+			return strings.ToLower(s)
+		},
 	}
 	tmpl, err := template.
 		New("markdown").
