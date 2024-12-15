@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   bump:
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
     if: ${{ ! startsWith(github.event.head_commit.message, 'Version bumped') }}
 
     steps:
