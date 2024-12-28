@@ -23,13 +23,8 @@ jobs:
           git config user.name "Maxim Voloshin"
           git config user.email "mvolloshin@gmail.com"
 
-      - name: Install verbum
-        run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
-          pip install git+https://github.com/chocolacula/verbum.git
+      - name: Install verbm
+        run: pipx install verbm
 
       - name: Bump version
-        run: |
-          source .venv/bin/activate
-          verbum up auto --commit --tag --push
+        run: verbm up auto --commit --tag --push
